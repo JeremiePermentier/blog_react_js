@@ -5,7 +5,10 @@ import { Link, useLocation } from "react-router";
 
 const StyledNavDashBoard = styled.nav`
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
     padding: 1rem;
     height: 100%;
     background-color: #f5f5f5;
@@ -21,6 +24,21 @@ const NavDashBoard = () => {
         <StyledNavDashBoard>
             {authContext?.isAuthenticated && isAdminPage && (
                 <Link to="/admin/ajouter-un-article">Ajouter un article</Link>
+            )}
+            {authContext?.isAuthenticated && isAdminPage && (
+                <Link to="/admin/ajouter-une-categorie">Ajouter une catégorie</Link>
+            )}
+            {authContext?.isAuthenticated && isAdminPage && (
+                <Link to="/admin/ajouter-un-tag">Ajouter un tag</Link>
+            )}
+            {authContext?.isAuthenticated && isAdminPage && (
+                <Link to="/admin/liste-des-articles">Articles</Link>
+            )}
+            {authContext?.isAuthenticated && isAdminPage && (
+                <Link to="/admin/liste-des-categories">Catégories</Link>
+            )}
+            {authContext?.isAuthenticated && isAdminPage && (
+                <Link to="/admin/liste-des-tags">Tags</Link>
             )}
         </StyledNavDashBoard>
     );

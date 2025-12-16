@@ -2,7 +2,9 @@ import styled from "styled-components";
 import Input from "../../shared/components/Input";
 import Button from "../../shared/components/Button";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { useParams } from "react-router";
+import { useCreatePost, useEditPost, usePost } from "../../hooks/usePost";
+import { useEffect } from "react";
 
 const StyledLoginForm = styled.form`
   display: flex;
@@ -29,76 +31,94 @@ const StyledLoginForm = styled.form`
 `;
 
 interface PostData {
-    title: string;
-    content: string;
-    coverImage: FileList | null;
+  title: string;
+  content: string;
+  coverImage: FileList | null;
 }
 
 const PostForm = () => {
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm<PostData>({
-        defaultValues: {
-            title: "",
-            content: "",
-            coverImage: null,
-        },
-    });
+  const { id } = useParams();
+  const isEdit = !!id;
 
-    const onSubmit = async (data: PostData) => {
-        try {
-            const apiUrl = import.meta.env.VITE_API_URL;
-            if (!apiUrl) throw new Error("VITE_API_URL n'est pas défini");
-            const formData = new FormData();
-            formData.append("title", data.title);
-            formData.append("content", data.content);
-            if (data.coverImage && data.coverImage.length > 0) {
-                formData.append("image", data.coverImage[0]);
-            }
-            
-            const response = await axios.post(
-                `${apiUrl}/api/v1/post/new`,
-                formData,
-                {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                },
-            }
-            );
-            console.log(response.data);
+  const { data: post } = usePost(id ?? "");
 
-            reset();
-        } catch (error) {
-            console.log(error);
-        }
-    };
-    return (
-        <StyledLoginForm onSubmit={handleSubmit(onSubmit)}>
-            <Input
-                type="text"
-                placeholder="Titre"
-                register={register("title", { required: "Le titre est requis" })}
-            />
-            {errors.title && <p className="error">{errors.title.message}</p>}
-            <Input
-                type="text"
-                placeholder="Contenu"
-                register={register("content", { required: "Le contenu est requis" })}
-            />
-            {errors.content && <p className="error">{errors.content.message}</p>}
-            <Input
-                type="file"
-                placeholder="Image de couverture"
-                register={register("coverImage", { required: "L'image de couverture est requise" })}
-            />
-            {errors.coverImage && <p className="error">{errors.coverImage.message}</p>}
-            <Button text="Publier" submit />
-        </StyledLoginForm>
-    );
+  const editPost = useEditPost(id ?? "");
+  const createPost = useCreatePost();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<PostData>({
+    defaultValues: {
+      title: "",
+      content: "",
+      coverImage: null,
+    },
+  });
+
+  useEffect(() => {
+    if (post && isEdit) {
+      reset({
+        title: post.title,
+        content: post.content,
+      });
+    }
+  }, [post, isEdit, reset]);
+
+  const onSubmit = async (data: PostData) => {
+    try {
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append("content", data.content);
+
+      if (data.coverImage && data.coverImage.length > 0) {
+        formData.append("image", data.coverImage[0]);
+      }
+
+      if (isEdit) {
+        editPost.mutate(formData);
+      } else {
+        createPost.mutate(formData);
+      }
+
+      reset();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <StyledLoginForm onSubmit={handleSubmit(onSubmit)}>
+      <Input
+        type="text"
+        placeholder="Titre"
+        register={register("title", { required: "Le titre est requis" })}
+      />
+      {errors.title && <p className="error">{errors.title.message}</p>}
+
+      <Input
+        type="text"
+        placeholder="Contenu"
+        register={register("content", { required: "Le contenu est requis" })}
+      />
+      {errors.content && <p className="error">{errors.content.message}</p>}
+
+      <Input
+        type="file"
+        placeholder="Image de couverture"
+        register={ isEdit ? false : register("coverImage", {
+          required: "L'image de couverture est requise",
+        })}
+      />
+      {errors.coverImage && (
+        <p className="error">{errors.coverImage.message}</p>
+      )}
+
+      <Button text={isEdit ? "Modifier" : "Publier"} submit />
+    </StyledLoginForm>
+  );
 };
 
 export default PostForm;

@@ -1,6 +1,10 @@
-const Input: React.FC<{type: string, placeholder: string, register: any}> = ({type, placeholder, register}) => {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    register?: any;
+}
+
+const Input: React.FC<InputProps> = ({ register, ...props }) => {
     return (
-        <input type={type} placeholder={placeholder} {...register} />
+        <input {...props} {...register} />
     );
 };
 
