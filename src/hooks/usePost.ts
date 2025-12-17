@@ -25,7 +25,7 @@ export const usePost = (id: string) => {
 export const useEditPost = (id: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => editPost(id, data),
+    mutationFn: (data: FormData) => editPost(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
@@ -35,7 +35,7 @@ export const useEditPost = (id: string) => {
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => createPost(data),
+    mutationFn: (data: FormData) => createPost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },

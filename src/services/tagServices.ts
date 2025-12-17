@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { TagData } from "../types/Tag.types";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -9,7 +10,7 @@ export const fetchTags = async () => {
   return res.data.data;
 };
 
-export const createTag = async (data: FormData) => {
+export const createTag = async (data: TagData) => {
   const res = await axios.post(`${apiUrl}/api/v1/tag/new`, data, {
     withCredentials: true,
   });
@@ -30,7 +31,7 @@ export const fetchOneTag = async (id: string) => {
   return res.data.tag;
 };
 
-export const editTag = async (id: string, data: FormData) => {
+export const editTag = async (id: string, data: TagData) => {
   const res = await axios.patch(`${apiUrl}/api/v1/tag/edit/${id}`, data, {
     withCredentials: true,
   });

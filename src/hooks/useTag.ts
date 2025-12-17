@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchTags, createTag, apiDeleteTag, fetchOneTag, editTag } from "../services/tagServices";
+import type { TagData } from "../types/Tag.types";
 
 export const useTags = () => {
     return useQuery({
@@ -11,7 +12,7 @@ export const useTags = () => {
 export const useCreateTag = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => createTag(data),
+    mutationFn: (data: TagData) => createTag(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
     },
@@ -32,7 +33,7 @@ export const useDeleteTag = () => {
 export const useEditTag = (id: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: any) => editTag(id, data),
+    mutationFn: (data: TagData) => editTag(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
     },

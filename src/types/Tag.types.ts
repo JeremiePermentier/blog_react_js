@@ -10,3 +10,7 @@ export interface ITagBase {
 export interface ITag extends ITagBase {
     _id: string;
 }
+
+export interface TagData {
+    name: string;
+}

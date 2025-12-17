@@ -5,6 +5,7 @@ import Button from "../../shared/components/Button";
 import { useCreateTag, useEditTag, useTag } from "../../hooks/useTag";
 import { useParams } from "react-router";
 import { useEffect } from "react";
+import type { TagData } from "../../types/Tag.types";
 
 const StyledForm = styled.form`
   display: flex;
@@ -29,10 +30,6 @@ const StyledForm = styled.form`
     margin: 0;
   }
 `;
-
-interface TagData {
-    name: string;
-}
 
 const TagForm: React.FC = () => {
     const { id } = useParams();
@@ -62,7 +59,6 @@ const TagForm: React.FC = () => {
     }, [tag, isEdit, reset])
 
     const onSubmit = async (data: TagData) => {
-        console.log(data)
         try {
             if (isEdit) {
                 editTag.mutate(data);
