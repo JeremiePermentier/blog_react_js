@@ -1,9 +1,11 @@
 import styled from "styled-components";
 import Input from "../../shared/components/Input";
 import { useForm } from "react-hook-form";
-import { useCreateCategory } from "../../hooks/useCategory";
+import { useCategory, useCreateCategory, useEditCategory } from "../../hooks/useCategory";
 import Button from "../../shared/components/Button";
 import type { CategoryData } from "../../types/Category.types";
+import { useParams } from "react-router";
+import { useEffect } from "react";
 
 const StyledForm = styled.form`
   display: flex;
@@ -30,6 +32,11 @@ const StyledForm = styled.form`
 `;
 
 const CategoryForm: React.FC = () => {
+    const { id } = useParams();
+    const isEdit = !!id;
+
+    const { data: category } = useCategory(id ?? "");
+    const editCategory = useEditCategory(id ?? "");
     const createCategory = useCreateCategory();
     const {
         register,
@@ -40,11 +47,25 @@ const CategoryForm: React.FC = () => {
         defaultValues: {
             name: ""
         }
-    })
+    });
+
+    useEffect(() => {
+        if (category && isEdit) {
+            reset({
+                name: category.name
+            })
+        }
+    }, [category, isEdit, reset])
 
     const onSubmit = async (data: CategoryData) => {
         try {
-            createCategory.mutate(data);
+
+            if (isEdit) {
+                createCategory.mutate(data);
+            } else {
+                editCategory.mutate(data);
+            }
+            
             reset()
         } catch (error) {
             console.log(error)
@@ -59,7 +80,7 @@ const CategoryForm: React.FC = () => {
                 register={register('name', { required: "Le nom de la catégorie est requis" })}
             />
             {errors.name && <p className="error">{errors.name.message}</p>}
-            <Button text={"Créer une catégorie"} submit />
+            <Button text={isEdit ? "Modifier une catégorie" : "Créer une catégorie"} submit />
         </StyledForm>
     )
 }

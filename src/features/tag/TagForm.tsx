@@ -2,7 +2,9 @@ import styled from "styled-components";
 import Input from "../../shared/components/Input";
 import { useForm } from "react-hook-form";
 import Button from "../../shared/components/Button";
-import { useCreateTag } from "../../hooks/useTag";
+import { useCreateTag, useEditTag, useTag } from "../../hooks/useTag";
+import { useParams } from "react-router";
+import { useEffect } from "react";
 
 const StyledForm = styled.form`
   display: flex;
@@ -33,7 +35,13 @@ interface TagData {
 }
 
 const TagForm: React.FC = () => {
+    const { id } = useParams();
+    const isEdit = !!id;
+
+    const { data: tag } = useTag(id ?? "");
+    const editTag = useEditTag(id ?? "");
     const createTag = useCreateTag();
+    
     const {
         register,
         handleSubmit,
@@ -43,11 +51,24 @@ const TagForm: React.FC = () => {
         defaultValues: {
             name: ""
         }
-    })
+    });
+
+    useEffect(() => {
+        if (tag && isEdit) {
+            reset({
+                name: tag.name
+            })
+        }
+    }, [tag, isEdit, reset])
 
     const onSubmit = async (data: TagData) => {
+        console.log(data)
         try {
-            createTag.mutate(data);
+            if (isEdit) {
+                editTag.mutate(data);
+            } else {
+                createTag.mutate(data);
+            }
             reset()
         } catch (error) {
             console.log(error)
@@ -62,7 +83,7 @@ const TagForm: React.FC = () => {
                 register={register('name', { required: "Le nom du tag est requis" })}
             />
             {errors.name && <p className="error">{errors.name.message}</p>}
-            <Button text={"Créer un tag"} submit />
+            <Button text={isEdit ? "Modifier un tag" : "Créer un tag"} submit />
         </StyledForm>
     )
 }

@@ -15,3 +15,24 @@ export const createTag = async (data: FormData) => {
   });
   return res.data.data;
 };
+
+export const apiDeleteTag = async (id: string) => {
+  const res = await axios.delete(`${apiUrl}/api/v1/tag/delete/${id}`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+export const fetchOneTag = async (id: string) => {
+  const res = await axios.get(`${apiUrl}/api/v1/tag/${id}`, {
+    withCredentials: true,
+  });
+  return res.data.tag;
+};
+
+export const editTag = async (id: string, data: FormData) => {
+  const res = await axios.patch(`${apiUrl}/api/v1/tag/edit/${id}`, data, {
+    withCredentials: true,
+  });
+  return res.data.data;
+};

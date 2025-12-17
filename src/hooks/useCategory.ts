@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { apiDeleteCategory, createCategory, fetchCategories } from "../services/categoryServices"
+import { apiDeleteCategory, createCategory, editCategory, fetchCategories, fetchOneCategory } from "../services/categoryServices"
 
 export const useCategories = () => {
     return useQuery({
@@ -14,7 +14,7 @@ export const useDeleteCategory = () => {
   return useMutation({
     mutationFn: apiDeleteCategory,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
   });
 };
@@ -24,7 +24,25 @@ export const useCreateCategory = () => {
   return useMutation({
     mutationFn: (data: any) => createCategory(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["category"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
+  });
+};
+
+export const useEditCategory = (id: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => editCategory(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
+
+export const useCategory = (id: string) => {
+  return useQuery({
+    queryKey: ["category", id],
+    queryFn: () => fetchOneCategory(id),
+    enabled: !!id,
   });
 };

@@ -6,3 +6,7 @@ export interface ITagBase {
     createdAt: Date;
     publishedAt: Date;
 }
+
+export interface ITag extends ITagBase {
+    _id: string;
+}

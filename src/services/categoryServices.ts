@@ -20,7 +20,7 @@ export const fetchOneCategory = async (id: string) => {
   const res = await axios.get(`${apiUrl}/api/v1/category/${id}`, {
     withCredentials: true,
   });
-  return res.data.data;
+  return res.data.category;
 };
 
 export const editCategory = async (id: string, data: FormData) => {

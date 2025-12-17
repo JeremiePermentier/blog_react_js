@@ -36,7 +36,7 @@ interface PostData {
   coverImage: FileList | null;
 }
 
-const PostForm = () => {
+const PostForm: React.FC = () => {
   const { id } = useParams();
   const isEdit = !!id;
 

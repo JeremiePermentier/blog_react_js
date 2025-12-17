@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from "@tanstack/react-table";
-import { useTags } from "../hooks/useTag";
+import { useDeleteTag, useTags } from "../hooks/useTag";
+import type { ITag } from "../types/Tag.types";
+import { useNavigate } from "react-router";
 
 const StyledAdminList = styled.div`
     padding: 1rem;
@@ -26,8 +28,10 @@ const Table = styled.table`
 
 const AdminListTags: React.FC = () => {
     const { data, isLoading, error } = useTags();
+    const deleteTag = useDeleteTag();
+    const navigate = useNavigate();
 
-    const columns: ColumnDef<{  header: string; accessorKey: string}>[] = [
+    const columns: ColumnDef<ITag>[] = [
         {
             header: "Nom du tag",
             accessorKey: "name",
@@ -35,7 +39,21 @@ const AdminListTags: React.FC = () => {
         {
             header: "Auteur",
             accessorKey: "author.email",
-        }
+        },
+        {
+            header: "Actions",
+            cell: ({ row }) => (
+                <>
+                <button
+                    onClick={() => deleteTag.mutate(row.original._id)}
+                    style={{ color: "red" }}
+                >
+                    Supprimer
+                </button>
+                <button onClick={() => navigate(`/admin/modifier-un-tag/${row.original._id}`)}>Modifier</button>
+                </>
+            ),
+        },
     ];
 
     const table = useReactTable({

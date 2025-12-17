@@ -77,7 +77,15 @@ const router = createBrowserRouter([
         element: <CategoryPage />,
       },
       {
+        path: "modifier-une-categorie/:id",
+        element: <CategoryPage />,
+      },
+      {
         path: "ajouter-un-tag",
+        element: <TagPage />,
+      },
+      {
+        path: "modifier-un-tag/:id",
         element: <TagPage />,
       },
       {
