@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"; // ✅ correct
+import type { ReactNode } from "react";
 import { useBreakpoint } from "../../hooks/useBreakpoint";
 
 type Props = {

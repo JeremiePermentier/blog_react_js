@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import Input from "../../shared/components/Input";
-import Button from "../../shared/components/Button";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router";
 import { useCreatePost, useEditPost, usePost } from "../../hooks/usePost";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Button from "../../shared/components/Button/Button";
 
 const StyledLoginForm = styled.form`
   display: flex;
@@ -37,6 +37,7 @@ interface PostData {
 }
 
 const PostForm: React.FC = () => {
+  const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const isEdit = !!id;
 
@@ -69,6 +70,7 @@ const PostForm: React.FC = () => {
 
   const onSubmit = async (data: PostData) => {
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("content", data.content);
@@ -77,13 +79,17 @@ const PostForm: React.FC = () => {
         formData.append("image", data.coverImage[0]);
       }
 
-      if (isEdit) {
-        editPost.mutate(formData);
-      } else {
-        createPost.mutate(formData);
-      }
+      const mutation = isEdit ? editPost : createPost;
 
-      reset();
+      mutation.mutate(formData, {
+        onSuccess: () => {
+          reset();
+          setLoading(false);
+        },
+        onError: () => {
+          setLoading(false);
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -116,7 +122,7 @@ const PostForm: React.FC = () => {
         <p className="error">{errors.coverImage.message}</p>
       )}
 
-      <Button text={isEdit ? "Modifier" : "Publier"} submit />
+      <Button type="submit" variant="primary" size="large" loading={loading}>{isEdit ? "Modifier" : "Publier"}</Button>
     </StyledLoginForm>
   );
 };

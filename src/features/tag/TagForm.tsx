@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import Input from "../../shared/components/Input";
 import { useForm } from "react-hook-form";
-import Button from "../../shared/components/Button";
+import Button from "../../shared/components/Button/Button";
 import { useCreateTag, useEditTag, useTag } from "../../hooks/useTag";
 import { useParams } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { TagData } from "../../types/Tag.types";
 
 const StyledForm = styled.form`
@@ -25,13 +25,14 @@ const StyledForm = styled.form`
   }
 
   p.error {
-    color: red;
+    color: red; 
     font-size: 0.8rem;
     margin: 0;
   }
 `;
 
 const TagForm: React.FC = () => {
+    const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const isEdit = !!id;
 
@@ -60,12 +61,17 @@ const TagForm: React.FC = () => {
 
     const onSubmit = async (data: TagData) => {
         try {
-            if (isEdit) {
-                editTag.mutate(data);
-            } else {
-                createTag.mutate(data);
-            }
-            reset()
+            setLoading(true);
+            const mutation = isEdit ? editTag : createTag;
+            mutation.mutate(data, {
+                onSuccess: () => {
+                    reset();
+                    setLoading(false);
+                },
+                onError: () => {
+                    setLoading(false);
+                }
+            })
         } catch (error) {
             console.log(error)
         }
@@ -79,7 +85,7 @@ const TagForm: React.FC = () => {
                 register={register('name', { required: "Le nom du tag est requis" })}
             />
             {errors.name && <p className="error">{errors.name.message}</p>}
-            <Button text={isEdit ? "Modifier un tag" : "Créer un tag"} submit />
+            <Button type="submit" variant="primary" size="large" loading={loading}>{isEdit ? "Modifier un tag" : "Créer un tag"}</Button>
         </StyledForm>
     )
 }

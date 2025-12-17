@@ -2,10 +2,10 @@ import styled from "styled-components";
 import Input from "../../shared/components/Input";
 import { useForm } from "react-hook-form";
 import { useCategory, useCreateCategory, useEditCategory } from "../../hooks/useCategory";
-import Button from "../../shared/components/Button";
+import Button from "../../shared/components/Button/Button";
 import type { CategoryData } from "../../types/Category.types";
 import { useParams } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const StyledForm = styled.form`
   display: flex;
@@ -32,6 +32,7 @@ const StyledForm = styled.form`
 `;
 
 const CategoryForm: React.FC = () => {
+    const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const isEdit = !!id;
 
@@ -59,14 +60,18 @@ const CategoryForm: React.FC = () => {
 
     const onSubmit = async (data: CategoryData) => {
         try {
+            setLoading(true);
 
-            if (isEdit) {
-                createCategory.mutate(data);
-            } else {
-                editCategory.mutate(data);
-            }
-            
-            reset()
+            const mutation = isEdit ? editCategory : createCategory;
+            mutation.mutate(data, {
+                onSuccess: () => {
+                    reset();
+                    setLoading(false);
+                },
+                onError: () => {
+                    setLoading(false);
+                }
+            })
         } catch (error) {
             console.log(error)
         }
@@ -80,7 +85,7 @@ const CategoryForm: React.FC = () => {
                 register={register('name', { required: "Le nom de la catégorie est requis" })}
             />
             {errors.name && <p className="error">{errors.name.message}</p>}
-            <Button text={isEdit ? "Modifier une catégorie" : "Créer une catégorie"} submit />
+            <Button type="submit" variant="primary" size="large" loading={loading}>{isEdit ? "Modifier une catégorie" : "Créer une catégorie"}</Button>
         </StyledForm>
     )
 }

@@ -1,12 +1,13 @@
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import Input from "../../shared/components/Input";
-import axios from "axios";
-import Button from "../../shared/components/Button";
 import { useNavigate } from "react-router";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import AuthContext from "../../app/AuthContext";
 import UserContext from "../../app/UserContext";
+import Button from "../../shared/components/Button/Button";
+import { useLogin } from "../../hooks/useUser";
+import type { LoginData } from "../../types/User.types";
 
 const StyledLoginForm = styled.form`
   display: flex;
@@ -32,15 +33,13 @@ const StyledLoginForm = styled.form`
   }
 `;
 
-interface LoginData {
-    email: string;
-    password: string;
-}
-
 const LoginForm = () => {
     const { setIsAuthenticated } = useContext(AuthContext);
     const { setUser } = useContext(UserContext);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const login = useLogin();
+
     const {
         register,
         handleSubmit,
@@ -54,17 +53,17 @@ const LoginForm = () => {
 
     const onSubmit = async (data: LoginData) => {
         try {
-            const apiUrl = import.meta.env.VITE_API_URL;
-            if (!apiUrl) throw new Error("VITE_API_URL n'est pas défini");
+            setLoading(true);
+            const response = await login.mutateAsync(data);
 
-            const response = await axios.post(`${apiUrl}/api/v1/users/login`, data, { withCredentials: true });
-
-            setUser(response.data);
+            setUser(response);
             setIsAuthenticated(true);
 
             navigate('/admin');
         } catch (error: any) {
             console.log("Erreur lors de la connexion :", error?.response?.data || error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -85,7 +84,7 @@ const LoginForm = () => {
                 })}
             />
             {errors.password && <p className="error">{errors.password.message}</p>}
-            <Button text="Se connecter" submit />
+            <Button type="submit" variant="primary" size="large" loading={loading}>Se connecter</Button>
         </StyledLoginForm>
     );
 };

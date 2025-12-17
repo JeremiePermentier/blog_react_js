@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import Button from "../../shared/components/Button";
-import axios from "axios";
+import Button from "../../shared/components/Button/Button";
 import Input from "../../shared/components/Input";
+import type { RegisterData } from "../../types/User.types";
+import { useRegister } from "../../hooks/useUser";
+import { useState } from "react";
 
 const StyledRegisterForm = styled.form`
   display: flex;
@@ -28,13 +30,9 @@ const StyledRegisterForm = styled.form`
   }
 `;
 
-interface RegisterData {
-  username: string;
-  email: string;
-  password: string;
-}
-
 const RegisterForm = () => {
+  const [loading, setLoading] = useState(false);
+  const registerMutation = useRegister();
   const {
     register,
     handleSubmit,
@@ -50,13 +48,13 @@ const RegisterForm = () => {
 
   const onSubmit = async (data: RegisterData) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      if (!apiUrl) throw new Error("VITE_API_URL n'est pas défini");
-
-      await axios.post(`${apiUrl}/api/v1/users/register`, data);
+      setLoading(true);
+      await registerMutation.mutateAsync(data);
       reset();
     } catch (error: any) {
       console.log("Erreur lors de l'inscription :", error?.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,7 +90,7 @@ const RegisterForm = () => {
         {errors.password && <p className="error">{errors.password.message}</p>}
       </div>
 
-      <Button text="Inscription" submit />
+      <Button type="submit" variant="primary" size="large" loading={loading}>Inscription</Button>
     </StyledRegisterForm>
   );
 };
