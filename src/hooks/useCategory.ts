@@ -1,12 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiDeleteCategory, createCategory, editCategory, fetchCategories, fetchOneCategory } from "../services/categoryServices"
 import type { CategoryData } from "../types/Category.types";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export const useCategories = () => {
-    return useQuery({
+    const navigate = useNavigate();
+    const query = useQuery({
         queryKey: ["categories"],
         queryFn: fetchCategories,
     });
+
+    useEffect(() => {
+      if (query.isError) {
+        const error = query.error as any;
+        if (error.response?.status === 401) {
+          navigate("/connexion");
+        }
+      }
+    }, [query.isError, query.error, navigate]);
+
+    return query;
 };
 
 export const useDeleteCategory = () => {

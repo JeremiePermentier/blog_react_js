@@ -7,6 +7,9 @@ import {
     type ColumnDef
 } from "@tanstack/react-table";
 import { useNavigate } from "react-router";
+import Button from "../shared/components/Button/Button";
+import { Container } from "../shared/components/Container/Container.style";
+import { Loader } from "../shared/Loader/Loader.style";
 
 const StyledAdminListPost = styled.div`
     padding: 1rem;
@@ -40,7 +43,7 @@ type Post = {
 };
 
 const AdminListPost: React.FC = () => {
-    const { data, isLoading, error } = usePosts();
+    const { data, isLoading } = usePosts();
     const deletePost = useDeletePost();
     const navigate = useNavigate();
 
@@ -57,13 +60,22 @@ const AdminListPost: React.FC = () => {
             header: "Actions",
             cell: ({ row }) => (
                 <>
-                <button
-                    onClick={() => deletePost.mutate(row.original._id)}
-                    style={{ color: "red" }}
-                >
-                    Supprimer
-                </button>
-                <button onClick={() => navigate(`/admin/modifier-un-article/${row.original._id}`)}>Modifier</button>
+                    <Button
+                        onClick={() => deletePost.mutate(row.original._id)}
+                        variant="danger"
+                        size="small"
+                        loading={false}
+                    >
+                        Supprimer
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        size="small"
+                        loading={false}
+                        onClick={() => navigate(`/admin/modifier-un-article/${row.original._id}`)}
+                    >
+                        Modifier
+                    </Button>
                 </>
             ),
         },
@@ -75,11 +87,13 @@ const AdminListPost: React.FC = () => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    if (isLoading) return <p>Chargement...</p>;
-    if (error) return <p>Erreur de chargement</p>;
+    if (isLoading) return <Loader />
 
     return (
         <StyledAdminListPost>
+            <Container textAlign="right">
+                <Button variant="secondary" size="small" onClick={() => navigate("/admin/ajouter-un-article")} loading={false}>Créer un article</Button>
+            </Container>
             <Table>
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (

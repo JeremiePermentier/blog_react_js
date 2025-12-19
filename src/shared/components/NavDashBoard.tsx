@@ -23,15 +23,6 @@ const NavDashBoard = () => {
     return (
         <StyledNavDashBoard>
             {authContext?.isAuthenticated && isAdminPage && (
-                <Link to="/admin/ajouter-un-article">Ajouter un article</Link>
-            )}
-            {authContext?.isAuthenticated && isAdminPage && (
-                <Link to="/admin/ajouter-une-categorie">Ajouter une catégorie</Link>
-            )}
-            {authContext?.isAuthenticated && isAdminPage && (
-                <Link to="/admin/ajouter-un-tag">Ajouter un tag</Link>
-            )}
-            {authContext?.isAuthenticated && isAdminPage && (
                 <Link to="/admin/liste-des-articles">Articles</Link>
             )}
             {authContext?.isAuthenticated && isAdminPage && (

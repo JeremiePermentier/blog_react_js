@@ -1,12 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchTags, createTag, apiDeleteTag, fetchOneTag, editTag } from "../services/tagServices";
 import type { TagData } from "../types/Tag.types";
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export const useTags = () => {
-    return useQuery({
-        queryKey: ["tags"],
-        queryFn: fetchTags,
-    });
+  const navigate = useNavigate();
+  const query = useQuery({
+    queryKey: ["tags"],
+    queryFn: fetchTags,
+  });
+
+  useEffect(() => {
+    if (query.isError) {
+      const error = query.error as any;
+      if (error.response?.status === 401) {
+        navigate("/connexion");
+      }
+    }
+  }, [query.isError, query.error, navigate]);
+
+  return query;
 };
 
 export const useCreateTag = () => {

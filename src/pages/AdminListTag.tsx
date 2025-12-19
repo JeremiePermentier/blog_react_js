@@ -3,6 +3,9 @@ import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from "@tan
 import { useDeleteTag, useTags } from "../hooks/useTag";
 import type { ITag } from "../types/Tag.types";
 import { useNavigate } from "react-router";
+import { Container } from "../shared/components/Container/Container.style";
+import Button from "../shared/components/Button/Button";
+import { Loader } from "../shared/Loader/Loader.style";
 
 const StyledAdminList = styled.div`
     padding: 1rem;
@@ -27,7 +30,7 @@ const Table = styled.table`
 `;
 
 const AdminListTags: React.FC = () => {
-    const { data, isLoading, error } = useTags();
+    const { data, isLoading } = useTags();
     const deleteTag = useDeleteTag();
     const navigate = useNavigate();
 
@@ -44,13 +47,22 @@ const AdminListTags: React.FC = () => {
             header: "Actions",
             cell: ({ row }) => (
                 <>
-                <button
+                <Button
+                    variant="danger"
+                    size="small"
+                    loading={false}
                     onClick={() => deleteTag.mutate(row.original._id)}
-                    style={{ color: "red" }}
                 >
                     Supprimer
-                </button>
-                <button onClick={() => navigate(`/admin/modifier-un-tag/${row.original._id}`)}>Modifier</button>
+                </Button>
+                <Button
+                    variant="secondary"
+                    size="small"
+                    loading={false}
+                    onClick={() => navigate(`/admin/modifier-un-tag/${row.original._id}`)}
+                >
+                    Modifier
+                </Button>
                 </>
             ),
         },
@@ -62,11 +74,13 @@ const AdminListTags: React.FC = () => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    if (isLoading) return <p>Chargement...</p>;
-    if (error) return <p>Erreur de chargement</p>;
+    if (isLoading) return <Loader />;
 
     return (
         <StyledAdminList>
+            <Container textAlign="right">
+                <Button variant="secondary" size="small" onClick={() => navigate("/admin/ajouter-un-tag")} loading={false}>Créer un tag</Button>
+            </Container>
             <Table>
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (

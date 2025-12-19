@@ -76,7 +76,7 @@ const PostForm: React.FC = () => {
       formData.append("content", data.content);
 
       if (data.coverImage && data.coverImage.length > 0) {
-        formData.append("image", data.coverImage[0]);
+        formData.append("coverImage", data.coverImage[0]);
       }
 
       const mutation = isEdit ? editPost : createPost;
@@ -114,7 +114,7 @@ const PostForm: React.FC = () => {
       <Input
         type="file"
         placeholder="Image de couverture"
-        register={ isEdit ? false : register("coverImage", {
+        register={register("coverImage", {
           required: "L'image de couverture est requise",
         })}
       />

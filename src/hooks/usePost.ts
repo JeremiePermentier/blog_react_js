@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   fetchPosts,
   fetchOnePost,
@@ -6,12 +7,25 @@ import {
   createPost,
   apiDeletePost
 } from "../services/postServices";
+import { useNavigate } from "react-router";
 
 export const usePosts = () => {
-  return useQuery({
+  const navigate = useNavigate();
+  const query = useQuery({
     queryKey: ["posts"],
     queryFn: fetchPosts,
   });
+
+  useEffect(() => {
+    if (query.isError) {
+      const error = query.error as any;
+      if (error.response?.status === 401) {
+        navigate("/connexion");
+      }
+    }
+  }, [query.isError, query.error, navigate]);
+
+  return query;
 };
 
 export const usePost = (id: string) => {

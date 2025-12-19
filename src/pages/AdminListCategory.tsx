@@ -3,6 +3,9 @@ import { useCategories, useDeleteCategory } from "../hooks/useCategory";
 import { useNavigate } from "react-router";
 import { flexRender, getCoreRowModel, useReactTable, type ColumnDef } from "@tanstack/react-table";
 import type { ICategory } from "../types/Category.types";
+import { Container } from "../shared/components/Container/Container.style";
+import Button from "../shared/components/Button/Button";
+import { Loader } from "../shared/Loader/Loader.style";
 
 const StyledAdminList = styled.div`
     padding: 1rem;
@@ -27,7 +30,7 @@ const Table = styled.table`
 `;
 
 const AdminListCategory: React.FC = () => {
-    const { data, isLoading, error } = useCategories();
+    const { data, isLoading } = useCategories();
     const deleteCategory = useDeleteCategory();
     const navigate = useNavigate();
 
@@ -44,13 +47,19 @@ const AdminListCategory: React.FC = () => {
             header: "Actions",
             cell: ({ row }) => (
                 <>     
-                    <button
-                    onClick={() => deleteCategory.mutate(row.original._id)}
-                    style={{ color: "red" }}
-                >
-                    Supprimer
-                </button>
-                <button onClick={() => navigate(`/admin/modifier-une-categorie/${row.original._id}`)}>Modifier</button></>
+                    <Button
+                        variant="danger"
+                        size="small"
+                        loading={false}
+                        onClick={() => deleteCategory.mutate(row.original._id)}
+                    >
+                        Supprimer
+                    </Button>
+                <Button
+                    variant="secondary"
+                    size="small"
+                    loading={false}
+                    onClick={() => navigate(`/admin/modifier-une-categorie/${row.original._id}`)}>Modifier</Button></>
             ),
         }
     ];
@@ -61,11 +70,13 @@ const AdminListCategory: React.FC = () => {
         getCoreRowModel: getCoreRowModel(),
     });
 
-    if (isLoading) return <p>Chargement...</p>;
-    if (error) return <p>Erreur de chargement</p>;
+    if (isLoading) return <Loader />;
 
     return (
         <StyledAdminList>
+            <Container textAlign="right">
+                <Button variant="secondary" size="small" onClick={() => navigate("/admin/ajouter-une-categorie")} loading={false}>Créer une catégorie</Button>
+            </Container>
             <Table>
                 <thead>
                     {table.getHeaderGroups().map(headerGroup => (
